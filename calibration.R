@@ -11,6 +11,21 @@ culture <- culture[order(culture$norm.fsc),]
 culture$volume <- 4/3 * pi * (culture$diameter/2)^3
 culture$volume.sd <- culture$volume * culture$diameter.sd/culture$diameter
 
+
+df <- t(read.table("meidata.txt"))
+df <- data.frame(cbind(diam=df[1:100,], scatter=df[101:200,]))
+write.csv(df, "meidata.csv", row.names=F, quote=F)
+mie <- read.csv("meidata.csv")
+
+par(mfrow=c(1,1))
+plot(mie$scatter/17000, mie$diam, log='xy',type='l', ylim=c(0.1,15), xlab="FSC",ylab="Diameter (µm)")
+f <- mie[which(mie$diam == 1),'scatter']
+with(culture, arrows(norm.fsc, diameter-culture$diameter.sd, norm.fsc, diameter + culture$diameter.sd,  code = 3, length=0, col='grey',lwd=2))
+with(culture, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
+points(culture$norm.fsc,culture$diameter,pch=16, col=2,cex=2)
+
+
+
 reg <- lm(diameter ~ norm.fsc, data=log(culture[1:8,c("diameter","norm.fsc")],10))
 reg2 <- lm(diameter ~ norm.fsc, data=log(culture[9:25,c("diameter","norm.fsc")],10))
 
