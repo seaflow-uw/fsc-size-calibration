@@ -15,32 +15,20 @@ culture$volume.sd <- culture$volume * culture$diameter.sd/culture$diameter
 culture2 <- aggregate(culture, by=list(culture$species), FUN=mean)
 culture2 <- culture2[order(culture2$norm.fsc),]
 
-mie <- read.csv("meidata.csv")
-mie$scatter <- mie$scatter/14000 # to scale with empirical data
-mie$diam <- 1.6*mie$diam
-mie$volume <- 4/3 * pi * (mie$diam/2)^3
+mie <- read.csv("mie_calibrated.csv")
+inst <- 751
 
-png("Seaflow-diameter-scatter.png",width=12, height=12, unit='in', res=100)
+png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
 
   par(mfrow=c(1,1), pty='s',cex=1.4)
-  plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.01,10), ylim=c(0.5,20))
+  plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.01,10), ylim=c(0.5,20), main=paste("#",inst))
   with(culture2, arrows(norm.fsc, diameter-culture2$diameter.sd, norm.fsc, diameter + culture2$diameter.sd,  code = 3, length=0, col='grey',lwd=2))
   with(culture2, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
-  axis(1, at=c(0.01,0.02,0.05,0.1,0.5,1,5), labels=c(0.01,0.02,0.05,0.1,0.5,1,5))
-  axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20), labels=c(0.1,0.2,0.5,1,2,5,10,20), las=1)
-  lines(mie$scatter, mie$diam, col='red3',lwd=2)
+  axis(1, at=c(0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
+  axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
+  lines(mie[,paste0("scatter_",inst)], mie[,paste0("diam_",inst)], col='red3',lwd=2)
   points(culture2$norm.fsc, culture2$diameter, bg=alpha(.rainbow.cols(nrow(culture2)),0.5), pch=21,cex=2)
   legend("topleft",legend=c(as.vector(culture2$Group.1),"Theoritical data"), pch=c(rep(21,nrow(culture2)),NA), lwd=c(rep(NA,nrow(culture2)),2), bty='n',
             pt.bg=alpha(.rainbow.cols(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3'), text.font=c(rep(3,nrow(culture2)),1))
-
-  # plot(culture2$norm.fsc, culture2$volume, log='xy', pch=NA,ylab=substitute(paste("Cell volume (",mu,"m3)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.01,10))
-  # with(culture2, arrows(norm.fsc, volume-culture2$volume.sd, norm.fsc, volume + culture2$volume.sd,  code = 3, length=0, col='grey',lwd=2))
-  # with(culture2, arrows(norm.fsc-norm.fsc.sd, volume, norm.fsc+norm.fsc.sd, volume,  code = 3, length=0,col='grey',lwd=2))
-  # axis(1, at=c(0.01,0.02,0.05,0.1,0.5,1,5), labels=c(0.01,0.02,0.05,0.1,0.5,1,5))
-  # axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000), labels=c(0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000), las=1)
-  # lines(mie$scatter, mie$volume, col='red3',lwd=2)
-  # points(culture2$norm.fsc, culture2$volume, bg=alpha(.rainbow.cols(nrow(culture2)),0.5), pch=21,cex=2)
-  # legend("topleft",legend=c(as.vector(culture2$Group.1),"Theoritical data"), pch=c(rep(21,nrow(culture2)),NA), lwd=c(rep(NA,nrow(culture2)),2), bty='n',
-  #           pt.bg=alpha(.rainbow.cols(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3'), text.font=c(rep(3,nrow(culture2)),1))
 
 dev.off()
