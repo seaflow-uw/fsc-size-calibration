@@ -21,10 +21,10 @@ inst <- 751
 png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
 
   par(mfrow=c(1,1), pty='s',cex=1.4)
-  plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.01,10), ylim=c(0.5,20), main=paste("#",inst))
+  plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.002,10), ylim=c(0.5,20), main=paste("#",inst))
   with(culture2, arrows(norm.fsc, diameter-culture2$diameter.sd, norm.fsc, diameter + culture2$diameter.sd,  code = 3, length=0, col='grey',lwd=2))
   with(culture2, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
-  axis(1, at=c(0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
+  axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
   axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
   lines(mie[,paste0("scatter_",inst)], mie$diam, col='red3',lwd=2)
   points(culture2$norm.fsc, culture2$diameter, bg=alpha(.rainbow.cols(nrow(culture2)),0.5), pch=21,cex=2)
