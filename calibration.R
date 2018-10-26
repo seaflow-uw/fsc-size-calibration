@@ -16,7 +16,8 @@ culture2 <- aggregate(culture, by=list(culture$species), FUN=mean)
 culture2 <- culture2[order(culture2$norm.fsc),]
 
 mie <- read.csv("calibrated-mie.csv")
-inst <- 751
+inst <- 740
+
 
 png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
 
@@ -26,9 +27,14 @@ png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
   with(culture2, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
   axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
   axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
-  lines(mie[,paste0("scatter_",inst)], mie$diam, col='red3',lwd=2)
+  lines(mie[,paste0("scatter_",inst,"_50")], mie$diam, col='red3',lwd=2)
+  lines(mie[,paste0("scatter_",inst,"_2.5")], mie$diam, col='grey',lwd=2)
+  lines(mie[,paste0("scatter_",inst,"_97.5")], mie$diam, col='grey',lwd=2)
+
   points(culture2$norm.fsc, culture2$diameter, bg=alpha(.rainbow.cols(nrow(culture2)),0.5), pch=21,cex=2)
-  legend("topleft",legend=c(as.vector(culture2$Group.1),"Theoritical data"), pch=c(rep(21,nrow(culture2)),NA), lwd=c(rep(NA,nrow(culture2)),2), bty='n',
+  legend("topleft",legend=c(as.vector(culture2$Group.1),"Mie-based model"), pch=c(rep(21,nrow(culture2)),NA, NA), lwd=c(rep(NA,nrow(culture2)),2, NA), bty='n',
             pt.bg=alpha(.rainbow.cols(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3'), text.font=c(rep(3,nrow(culture2)),1))
+
+             points(1,1,pch=13, col='red3', cex=1.5) # beads location based on  corrected Mie theory
 
 dev.off()
