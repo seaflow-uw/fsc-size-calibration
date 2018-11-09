@@ -2,9 +2,9 @@
 ### LINEAR REGRESSION ###
 #########################
 library(scales)
+library(viridis)
 path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
 setwd(path.to.git.repository)
-.rainbow.cols <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow","#FF7F00", "red", "#7F0000"))
 
 culture <- read.csv("scatter_calibration.csv")
 culture$norm.fsc <- culture$fsc / culture$fsc.beads
@@ -30,9 +30,9 @@ png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
   lines(mie$scatter, mie[,paste0("diam_",inst,"_lwr")], col='grey', lwd=2)
   axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
   axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
-  points(culture2$norm.fsc, culture2$diameter, bg=alpha(.rainbow.cols(nrow(culture2)),0.5), pch=21,cex=2)
+  points(culture2$norm.fsc, culture2$diameter, bg=alpha(viridis(nrow(culture2)),0.5), pch=21,cex=2)
   legend("topleft",legend=c(as.vector(culture2$Group.1),"Mie-based model (index refraction = 1.031 +/- 0.014)","beads"), pch=c(rep(21,nrow(culture2)),NA, 13), lwd=c(rep(NA,nrow(culture2)),2, NA), bty='n',
-            pt.bg=alpha(.rainbow.cols(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3','red3'), text.font=c(rep(3,nrow(culture2)),1,1))
+            pt.bg=alpha(viridis(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3','red3'), text.font=c(rep(3,nrow(culture2)),1,1))
 
              points(1,1,pch=13, col='red3',lwd=2, cex=1.5) # beads location based on  corrected Mie theory
 
