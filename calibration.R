@@ -15,6 +15,11 @@ culture$volume.sd <- culture$volume * culture$diameter.sd/culture$diameter
 culture2 <- aggregate(culture, by=list(culture$species), FUN=mean)
 culture2 <- culture2[order(culture2$norm.fsc),]
 
+beads <-
+
+
+
+
 mie <- read.csv("calibrated-mie.csv")
 inst <- 740
 
