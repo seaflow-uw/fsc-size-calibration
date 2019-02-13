@@ -1,71 +1,105 @@
-#########################
-### LINEAR REGRESSION ###
-#########################
 library(scales)
 library(viridis)
 path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
 setwd(path.to.git.repository)
 
 
+#############################
+### scatter normalization ###
+#############################
 
-### BEADS
 beads740 <- read.csv("740-summary.csv")
-beads740 <- beads740[order(beads740$size),]
 beads740$fsc <- 10^((beads740$fsc.corr.high/2^16)*3.5)
 id.740 <- which(beads740$size == 1) # find 1 micron beads
+beads740$normalized.fsc <- beads740$fsc/mean(beads740[id.740,'fsc'])
+beads740 <- beads740[order(beads740$size),]
 
 beads989<- read.csv("989-summary.csv")
-beads989 <- beads989[order(beads989$size),]
 beads989$fsc <- 10^((beads989$fsc.corr.high/2^16)*3.5)
 id.989 <- which(beads989$size == 1) # find 1 micron beads
+beads989$normalized.fsc <- beads989$fsc/mean(beads989[id.989,'fsc'])
+beads989 <- beads989[order(beads989$size),]
 
 beads751 <- read.csv("751-summary.csv")
-beads751 <- beads751[order(beads751$size),]
 beads751$fsc <- 10^((beads751$fsc.corr.high/2^16)*3.5)
 id.751<- which(beads751$size == 1) # find 1 micron beads
+beads751$normalized.fsc <- beads751 $fsc/mean(beads751 [id.751,'fsc'])
+beads751 <- beads751[order(beads751$size),]
 
-mie.b <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beads.csv" ,header=F)) # beads
-id <- findInterval(c(0.3, 0.5, 0.75, 1, 1.83, 3.1, 5.7) , mie.b[,1]) # find beads
-id1 <- findInterval(1 , mie.b[,1]) # find 1 micron beads
 
-png("Mie-beads-scatter.png",width=6, height=12, unit='in', res=100)
+####################
+### OPTIMIZATION ###
+####################
+library(DEoptim)
+                 
+# Mie theory fitting
+# n <- c(1.35/1.3371, 1.41/1.3371) # range given in Lehmuskero et al. Progr Oceanogr 2018
+mie2 <- t(read.csv("meidata-1017.csv" ,header=F)) # low
+mie1 <- t(read.csv("meidata-1031.csv" ,header=F)) # fit
+mie3 <- t(read.csv("meidata-1045.csv" ,header=F)) # high
+mie4 <- t(read.csv("meidata-beads.csv" ,header=F)) # particle of 1 µm, index of refraction of 1.6033
 
-par(mfrow=c(3,1),pty='s')
+# optimization routine
+sigma.lsq <- function(mie, beads, params){
 
-inst <- 740; c <- 450*0.9; b <- 1.18
-plot((mie.b[,2]/c)^b, mie.b[,1], col='red3', type='l', lwd=2, ylim=c(0.3,7), xlim=c(0.005,10), xaxt='n', yaxt='n', log='xy',xlab="Normalized scatter (dimensionless)", main=paste("#",inst),ylab=substitute(paste("Cell diameter (",mu,"m)")))
-points((beads740$fsc/mean(beads740[id.1,'fsc'])), beads740$size, bg=alpha(viridis(nrow(beads740)),0.5),cex=2, pch=21)
-axis(2, at=c(0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), labels=c(0.005,0.01, 0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), las=1)
-axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10),labels=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10))
-legend("topleft",legend=c(paste(unique(beads740$size), 'µm-beads'), "Mie-based model (index refraction = 1.6)"), bty='n',
-        pch=c(rep(21,nrow(beads740)/2), NA), lwd=c(rep(NA,nrow(beads740)/2), 2),col=c(rep(1,nrow(beads740)/2),'red3'),
-        pt.bg=alpha(c(viridis(nrow(beads740)/2), 'red3'),0.5))
+     c <- params[1]
+     b <- params[2]
+     id <- findInterval(beads$size, mie[,1])
+     scatt <- (mie[id,2]/c)^b
 
-inst <- 751; c <- 450; b <- 1
-plot((mie.b[,2]/c)^b, mie.b[,1], col='red3', type='l', lwd=2, ylim=c(0.3,7), xlim=c(0.005,10), xaxt='n', yaxt='n', log='xy',xlab="Normalized scatter (dimensionless)", main=paste("#",inst),ylab=substitute(paste("Cell diameter (",mu,"m)")))
-points((beads751$fsc/mean(beads751[id.1,'fsc'])), beads751$size, bg=alpha(viridis(nrow(beads740)),0.5),cex=2, pch=21)
-axis(2, at=c(0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), labels=c(0.005,0.01, 0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), las=1)
-axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10),labels=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10))
-legend("topleft",legend=c(paste(unique(beads740$size), 'µm-beads'), "Mie-based model (index refraction = 1.6)"), bty='n',
-        pch=c(rep(21,nrow(beads751)/2), NA), lwd=c(rep(NA,nrow(beads751)/2), 2),col=c(rep(1,nrow(beads751)/2),'red3'),
-        pt.bg=alpha(c(viridis(nrow(beads751)/2), 'red3'),0.5))
+           df <- data.frame(obs=beads$normalized.fsc, pred=scatt)
+      sigma <- mean(abs(df$obs - df$pred)/df$obs,na.rm=T)
+      return(sigma)
+  }
 
-inst <- 989; c <- 450; b <- 1.05
-plot((mie.b[,2]/c)^b, mie.b[,1], col='red3', type='l', lwd=2, ylim=c(0.3,7), xlim=c(0.005,10), xaxt='n', yaxt='n', log='xy', xlab="Normalized scatter (dimensionless)", main=paste("#",inst),ylab=substitute(paste("Cell diameter (",mu,"m)")))
-points((beads989$fsc/mean(beads989[id.1,'fsc'])), beads989$size, bg=alpha(viridis(nrow(beads740)),0.5),cex=2, pch=21)
-axis(2, at=c(0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), labels=c(0.005,0.01, 0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,1000), las=1)
-axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10),labels=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10))
-legend("topleft",legend=c(paste(unique(beads740$size), 'µm-beads'), "Mie-based model (index refraction = 1.6)"), bty='n',
-        pch=c(rep(21,nrow(beads989)/2), NA), lwd=c(rep(NA,nrow(beads989)/2), 2),col=c(rep(1,nrow(beads989)/2),'red3'),
-        pt.bg=alpha(c(viridis(nrow(beads989)/2), 'red3'),0.5))
 
+
+##########################
+#### CALIBRATION BEADS ### Mie theory optimization
+##########################
+png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
+
+par(mfrow=c(1,3), pty='s')
+
+for(inst in c(740,751,989)){
+
+# inst <- 740
+
+### Optiomization
+
+if(inst == 740) beads <- beads740
+if(inst == 751) beads <- beads751
+if(inst == 989) beads <- beads989
+
+beads1 <- subset(beads,  size < 3) # run to test optimzation across range of particle size
+
+f <- function(params) sigma.lsq(mie=mie4, beads=beads1, params)
+res <- DEoptim(f, lower=c(0,0), upper=c(10000,2), control=DEoptim.control(itermax=1000, reltol=1e-8,trace=100, steptol=100, strategy=2, parallelType=0))
+print(res$optim$bestval)
+params <- res$optim$bestmem # optimized 'c' and 'b' values
+print(params)
+
+
+plot(beads$normalized.fsc, beads$size,log='xy', main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)") 
+lines((mie4[,2]/c)^b, mie4[,1], col='red3')
+legend("topleft",legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
+
+}
 dev.off()
 
 
 
-### CULTURES
+mie <- data.frame(cbind(mie_740, mie_751[,-1], mie_989[,-1]))
+
+write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
 
 
+#####################
+### PHYTOPLANKTON ### validation
+#####################
+
+
+### SIZE
 culture <- read.csv("scatter_calibration.csv")
 culture$norm.fsc <- culture$fsc / culture$fsc.beads
 culture$norm.fsc.sd <- culture$fsc.sd / culture$fsc.beads
@@ -79,7 +113,7 @@ mie <- read.csv("calibrated-mie.csv")
 inst <- 740
 
 
-png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=100)
+png(paste0(inst,"-Size-scatter.png"),width=12, height=12, unit='in', res=200)
 
   par(mfrow=c(1,1), pty='s',cex=1.4)
   plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.002,10), ylim=c(0.5,20), main=paste("#",inst))
