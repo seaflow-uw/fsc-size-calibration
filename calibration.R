@@ -3,7 +3,6 @@ library(viridis)
 path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
 setwd(path.to.git.repository)
 
-
 #############################
 ### scatter normalization ###
 #############################
@@ -31,7 +30,7 @@ beads751 <- beads751[order(beads751$size),]
 ### OPTIMIZATION ###
 ####################
 library(DEoptim)
-                 
+
 # Mie theory fitting
 # n <- c(1.35/1.3371, 1.41/1.3371) # range given in Lehmuskero et al. Progr Oceanogr 2018
 mie2 <- t(read.csv("meidata-1017.csv" ,header=F)) # low
@@ -50,7 +49,9 @@ sigma.lsq <- function(mie, beads, params){
            df <- data.frame(obs=beads$normalized.fsc, pred=scatt)
       sigma <- mean(abs(df$obs - df$pred)/df$obs,na.rm=T)
       return(sigma)
+
   }
+
 
 
 
@@ -80,8 +81,9 @@ params <- res$optim$bestmem # optimized 'c' and 'b' values
 print(params)
 
 
-plot(beads$normalized.fsc, beads$size,log='xy', main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)") 
-lines((mie4[,2]/c)^b, mie4[,1], col='red3')
+plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)")
+axis(1, at=c(0.01, 0.1, 1,10))
+lines((mie4[,2]/params[1])^params[2], mie4[,1], col='red3')
 legend("topleft",legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
 
 }
