@@ -3,10 +3,7 @@ The goal of this project is to use an optimized Mie theory to infer particle cel
 
 ![alt text](Mie-beads-scatter.png "SeaFlow forward scatter measurements compared to optimized Mie theory")
 
-To evaluate the applicability of these solutions, we compared Mie-predicted cell diameter to results from analysis of numerous phytoplankton cultures.The light scattering property of each cell (alive, not fixed), normalized by 1 micron beads, was measured by SeaFlow and by Coulter Counter.
-
-![alt text](740-Size-scatter.png "SeaFlow forward scatter measurements compared to optimized Mie theory")
-
-
+To evaluate the applicability of these solutions, we compared Mie-predicted cell diameter to observations (using a Coulter Counter) of numerous phytoplankton cultures. 
+![alt text](740-Size-scatter.png "Mie-predicted cell diameter compared to observations (using Coulter Counter)")
 
 ***François Ribalet, Megan Schatz and Jarred Swalwell contributed to this project.***
