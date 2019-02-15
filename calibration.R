@@ -154,9 +154,9 @@ mie <- read.csv("calibrated-mie.csv")
 inst <- 740
 
 
-png("Size-scatter.png",width=6, height=6, unit='in', res=200)
+png("Size-scatter.png",width=12, height=6, unit='in', res=200)
 
-  par(mfrow=c(1,1), pty='s',cex=1.2)
+  par(mfrow=c(1,2), pty='s',cex=1.2)
   plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.002,10), ylim=c(0.5,20), main=paste(inst))
   with(culture2, arrows(norm.fsc, diameter-culture2$diameter.sd, norm.fsc, diameter + culture2$diameter.sd,  code = 3, length=0, col='grey',lwd=2))
   with(culture2, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
