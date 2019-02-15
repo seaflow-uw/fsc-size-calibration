@@ -116,7 +116,7 @@ s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3), xout=scatter)
 
 
 ### PLOT Observartions vs Predicted cell size
-plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)")
+plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1)
 axis(1, at=c(0.01, 0.1, 1,10))
 lines((mie4[,2]/params[1])^params[2], mie4[,1], col='red3')
 legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
