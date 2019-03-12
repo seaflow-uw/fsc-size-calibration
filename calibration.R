@@ -59,6 +59,7 @@ sigma.lsq <- function(mie, beads, params){
 #### CALIBRATION BEADS ### Mie theory optimization
 ##########################
 png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
+png("Mie-scatter.png",width=12, height=6, unit='in', res=400)
 
 par(mfrow=c(1,2), pty='s', cex=1.2)
 
@@ -167,7 +168,7 @@ png("Size-scatter.png",width=12, height=6, unit='in', res=200)
   axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
   axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
   points(culture2$norm.fsc, culture2$diameter, bg=alpha(viridis(nrow(culture2)),0.5), pch=21,cex=2)
-  legend("topleft",legend=c(as.vector(culture2$Group.1), "Mie-based model (n = 1.031 +/- 0.014)"), cex=0.5, pch=c(rep(21,nrow(culture2)),NA), lwd=c(rep(NA,nrow(culture2)),2), bty='n',
+  legend("topleft",legend=c(as.vector(culture2$Group.1), "Mie-based model (n = 1.3785 +/- 0.014)"), cex=0.5, pch=c(rep(21,nrow(culture2)),NA), lwd=c(rep(NA,nrow(culture2)),2), bty='n',
             pt.bg=alpha(viridis(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3'), text.font=c(rep(3,nrow(culture2)),1))
 
 dev.off()
