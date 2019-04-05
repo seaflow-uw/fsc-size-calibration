@@ -139,7 +139,11 @@ write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
 #####################
 ### PHYTOPLANKTON ### validation
 #####################
+library(scales)
+library(viridis)
 
+path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
+setwd(path.to.git.repository)
 
 ### SIZE
 culture <- read.csv("scatter_calibration.csv")
@@ -172,3 +176,11 @@ png("Size-scatter.png",width=12, height=6, unit='in', res=200)
             pt.bg=alpha(viridis(nrow(culture2)),0.5), col=c(rep(1,nrow(culture2)),'red3'), text.font=c(rep(3,nrow(culture2)),1))
 
 dev.off()
+
+
+
+### correlation
+id <- findInterval(culture2$norm.fsc, mie$scatter)
+df <- data.frame(observed=culture2$diameter, predicted=mie[id,paste0("diam_",inst,"_mid")])
+reg <- lm(observed ~ predicted, data=df)
+summary(reg)
