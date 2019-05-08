@@ -60,7 +60,7 @@ png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
 
 par(mfrow=c(1,3), pty='s', cex=1.2)
 
-for(inst in c(740,751,989)){
+for(inst in c(989,751,740)){
 
 # inst <- 740
 
