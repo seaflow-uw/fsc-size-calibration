@@ -47,26 +47,22 @@ sigma.lsq <- function(mie, beads, params){
      scatt <- (mie[id,2]/c)^b
 
            df <- data.frame(obs=beads$normalized.fsc, pred=scatt)
-      sigma <- mean(abs(df$obs - df$pred)/df$obs,na.rm=T)
+      sigma <- mean(((df$obs - df$pred)/df$obs)^2,na.rm=T)
       return(sigma)
-
   }
 
 
 
-
-##########################
-#### CALIBRATION BEADS ### Mie theory optimization
-##########################
+  ######################################################
+  #### compare MIE prediction with calibration beads ###
+  ######################################################
 png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
-png("Mie-scatter.png",width=12, height=6, unit='in', res=400)
 
-par(mfrow=c(1,2), pty='s', cex=1.2)
+par(mfrow=c(1,3), pty='s', cex=1.2)
 
 for(inst in c(740,751,989)){
 
 # inst <- 740
-
 
 ### Optimization
 
@@ -74,7 +70,9 @@ if(inst == 740) beads <- beads740
 if(inst == 751) beads <- beads751
 if(inst == 989) beads <- beads989
 
-f <- function(params) sigma.lsq(mie=mie4, beads=beads, params)
+beads1 <- subset(beads,  size > 0.3) # run to test optimzation across range of particle size, except 0.3 microns beads not properly analyzed.
+
+f <- function(params) sigma.lsq(mie=mie4, beads=beads1, params)
 res <- DEoptim(f, lower=c(0,0), upper=c(10000,2), control=DEoptim.control(itermax=1000, reltol=1e-8,trace=100, steptol=100, strategy=2, parallelType=0))
 print(res$optim$bestval)
 params <- res$optim$bestmem # optimized 'c' and 'b' values
@@ -82,9 +80,12 @@ print(params)
 
 
 ### CREATE LOOKUP TABLE
-d <- 0.220 #Shalapyonok et al. 2001; 0.220 (Li et al. 1992, Veldhuis et al. 2004, and more studies agreed with 220 fg C um-3)
+#d <- 0.220; e <- 1 # LINEAR Shalapyonok et al. 2001; 0.220 (Li et al. 1992, Veldhuis et al. 2004, and more studies agreed with 220 fg C um-3)
+#d <- 0.54; e <- 0.85 # EXPO Roy, S., Sathyendranath, S. & Platt, T. Size-partitioned phytoplankton carbon and carbon-to-chlorophyll ratio from ocean colour by an absorption-based bio-optical algorithm. Remote Sens. Environ. 194, 177–189 (2017).
+d <- 0.216; e <- 0.939 # EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
+
 max.scatter <- 20
-min.scatter <- 0.0001
+min.scatter <- 0.00001
 
 b <- params[2]
 c <- params[1]
@@ -93,9 +94,9 @@ scatter <- 10^(seq(log10(min(mie1[,2]/c)), log10(max(mie3[,2]/c)),length.out=100
 s1 <- approx((mie1[,2]/c)^b, mie1[,1], xout=scatter)
 s2 <- approx((mie2[,2]/c)^b, mie2[,1], xout=scatter)
 s3 <- approx((mie3[,2]/c)^b, mie3[,1], xout=scatter)
-s4 <- approx((mie1[,2]/c)^b, d*(4/3*pi*(0.5*mie1[,1])^3), xout=scatter)
-s5 <- approx((mie2[,2]/c)^b, d*(4/3*pi*(0.5*mie2[,1])^3), xout=scatter)
-s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3), xout=scatter)
+s4 <- approx((mie1[,2]/c)^b, d*(4/3*pi*(0.5*mie1[,1])^3)^e, xout=scatter)
+s5 <- approx((mie2[,2]/c)^b, d*(4/3*pi*(0.5*mie2[,1])^3)^e, xout=scatter)
+s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3)^e, xout=scatter)
 
 		if(inst == 740){mie_740 <- data.frame(cbind(scatter=s1$x,
                                                   diam_740_mid=s1$y,diam_740_upr=s2$y,diam_740_lwr = s3$y,
@@ -120,7 +121,7 @@ s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3), xout=scatter)
 plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',xlim=c(0.002,10), ylim=c(0.2,20), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1, main=paste(inst))
 axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
 axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
-lines((mie4[,2]/params[1])^params[2], mie4[,1], col='red3')
+lines((mie4[,2]/c)^b, mie4[,1], col='red3')
 legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6003)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
 
 }
@@ -162,7 +163,7 @@ inst <- 740
 
 png("Size-scatter.png",width=12, height=6, unit='in', res=200)
 
-  par(mfrow=c(1,2), pty='s',cex=1.2)
+  par(mfrow=c(1,1), pty='s',cex=1.2)
   plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Cell diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.002,10), ylim=c(0.2,20), main=paste(inst))
   with(culture2, arrows(norm.fsc, diameter-culture2$diameter.sd, norm.fsc, diameter + culture2$diameter.sd,  code = 3, length=0, col='grey',lwd=2))
   with(culture2, arrows(norm.fsc-norm.fsc.sd, diameter, norm.fsc+norm.fsc.sd, diameter,  code = 3, length=0,col='grey',lwd=2))
