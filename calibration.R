@@ -125,17 +125,20 @@ lines((mie4[,2]/c)^b, mie4[,1], col='red3')
 legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6003)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
 
 }
+
 dev.off()
 
 
 
 mie <- data.frame(cbind(mie_740, mie_751[,-1], mie_989[,-1]))
+which(is.na(mie[,]))
+summary(mie)
 
 write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
 
-
-
-
+q <- 'mid'
+id <- findInterval(0.6, mie[,paste0('diam_740_',q)])
+mie[id,paste0('Qc_740_',q)]*1000
 
 #####################
 ### PHYTOPLANKTON ### validation
