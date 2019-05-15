@@ -32,10 +32,10 @@ beads751 <- beads751[order(beads751$size),]
 library(DEoptim)
 
 # Mie theory fitting
-# n <- c(1.35/1.3371, 1.41/1.3371) # range given in Lehmuskero et al. Progr Oceanogr 2018
-mie2 <- t(read.csv("meidata-1017.csv" ,header=F)) # low
-mie1 <- t(read.csv("meidata-1031.csv" ,header=F)) # fit
-mie3 <- t(read.csv("meidata-1045.csv" ,header=F)) # high
+# n for phyto = 1.35- 1.41 # see Lehmuskero et al. Progr Oceanogr 2018
+mie2 <- t(read.csv("meidata-1010.csv" ,header=F)) # low
+mie1 <- t(read.csv("meidata-1032.csv" ,header=F)) # fit
+mie3 <- t(read.csv("meidata-1055.csv" ,header=F)) # high
 mie4 <- t(read.csv("meidata-beads.csv" ,header=F)) # particle of 1 µm, index of refraction of 1.6033
 
 # optimization routine
@@ -53,26 +53,26 @@ sigma.lsq <- function(mie, beads, params){
 
 
 
-  ######################################################
-  #### compare MIE prediction with calibration beads ###
-  ######################################################
+######################################################
+#### compare MIE prediction with calibration beads ###
+######################################################
 png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
 
 par(mfrow=c(1,3), pty='s', cex=1.2)
 
-for(inst in c(989,751,740)){
+for(inst in c(740,751,989)){
 
 # inst <- 740
 
-### Optimization
+### Optiomization
 
 if(inst == 740) beads <- beads740
 if(inst == 751) beads <- beads751
 if(inst == 989) beads <- beads989
 
-beads1 <- subset(beads,  size > 0.3) # run to test optimzation across range of particle size, except 0.3 microns beads not properly analyzed.
+#beads1 <- subset(beads,  size > 0.3) # run to test optimzation across range of particle size, except 0.3 microns beads not properly analyzed.
 
-f <- function(params) sigma.lsq(mie=mie4, beads=beads1, params)
+f <- function(params) sigma.lsq(mie=mie4, beads=beads, params)
 res <- DEoptim(f, lower=c(0,0), upper=c(10000,2), control=DEoptim.control(itermax=1000, reltol=1e-8,trace=100, steptol=100, strategy=2, parallelType=0))
 print(res$optim$bestval)
 params <- res$optim$bestmem # optimized 'c' and 'b' values
@@ -84,12 +84,12 @@ print(params)
 #d <- 0.54; e <- 0.85 # EXPO Roy, S., Sathyendranath, S. & Platt, T. Size-partitioned phytoplankton carbon and carbon-to-chlorophyll ratio from ocean colour by an absorption-based bio-optical algorithm. Remote Sens. Environ. 194, 177–189 (2017).
 d <- 0.216; e <- 0.939 # EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 
-max.scatter <- 20
-min.scatter <- 0.00001
+max.scatter <- 30
+min.scatter <- 0.000865
 
 b <- params[2]
 c <- params[1]
-scatter <- 10^(seq(log10(min(mie1[,2]/c)), log10(max(mie3[,2]/c)),length.out=10000))
+scatter <- 10^(seq(log10(min(mie2[,2]/c)), log10(max(mie3[,2]/c)),length.out=10000))
 
 s1 <- approx((mie1[,2]/c)^b, mie1[,1], xout=scatter)
 s2 <- approx((mie2[,2]/c)^b, mie2[,1], xout=scatter)
@@ -115,23 +115,18 @@ s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3)^e, xout=scatter)
                       	mie_989 <- subset(mie_989, scatter >= min.scatter & scatter <= max.scatter)
 						}
 
-
-
-### PLOT Observartions vs Predicted cell size
 plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',xlim=c(0.002,10), ylim=c(0.2,20), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1, main=paste(inst))
 axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
 axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
 lines((mie4[,2]/c)^b, mie4[,1], col='red3')
-legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6003)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
+legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.603)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
 
 }
 
 dev.off()
 
 
-
-mie <- data.frame(cbind(mie_740, mie_751[,-1], mie_989[,-1]))
-which(is.na(mie[,]))
+mie <- data.frame(cbind(mie_740[,], mie_751[,-1], mie_989[,-1]))
 summary(mie)
 
 write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
