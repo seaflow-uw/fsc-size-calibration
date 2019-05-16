@@ -3,6 +3,6 @@ The goal of this project was to infer particle cell size from forward scatter me
 
 To evaluate the applicability of these solutions, we compared Mie-predicted cell diameter to observations of 9 phytoplankton cultures using Coulter Counter (right panel). The Mie-predicted cell diameter using the mid-range index of refraction (1.38) was in good agreement with observations (R<sup>2</sup> = 0.90, p < 0.0001). Discrepancies were observed for the diameter of the larger phytoplankton (<i>Geminifera cryophila</i> and <i>Thalassiosira weissflogii</i>) and the smaller cyanobacteria (<i>Prochlorocococcus</i> MIT9312 and MED4 and <i>Synechococcus</i> WH8012), which, for larger phytoplankton, may be related to inappropriate approximation of the spherical shape of particles used in the Mie theory (Quirantes and Bernard, 2004), while for small cyanobacteria, direct measurements of cell diameter were less reliable as they were near the detection limit of  the Coulter Counter Multisizer.
 
-![alt text](Mie-scatter.png "Mie-predicted cell diameter compared to observations")
+![alt text](Mie-beads-scatter.png "Mie-predicted cell diameter compared to observations")
 
 ***François Ribalet, Megan Schatz and Jarred Swalwell contributed to this project.***
