@@ -56,7 +56,7 @@ sigma.lsq <- function(mie, beads, params){
 ######################################################
 #### compare MIE prediction with calibration beads ###
 ######################################################
-png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
+pdf("Mie-beads-scatter.pdf",width=12, height=6)
 
 par(mfrow=c(1,3), pty='s', cex=1.2)
 
@@ -160,7 +160,7 @@ mie <- read.csv("calibrated-mie.csv")
 inst <- 740
 
 
-png("Size-scatter.png",width=12, height=6, unit='in', res=200)
+pdf("Size-scatter.pdf",width=12, height=6)
 
   par(mfrow=c(1,1), pty='s',cex=1.2)
   plot(culture2$norm.fsc, culture2$diameter, log='xy', pch=NA,ylab=substitute(paste("Diameter (",mu,"m)")), xlab="Normalized scatter (dimensionless)",cex=2, xaxt='n', yaxt='n', xlim=c(0.002,10), ylim=c(0.2,20), main=paste(inst))
