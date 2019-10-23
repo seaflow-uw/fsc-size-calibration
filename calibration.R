@@ -85,8 +85,8 @@ print(params)
 #d <- 0.216; e <- 0.939 # ALL Protists EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 d <- 0.261; e <- 0.860 # < 3000 µm3 EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 
-max.scatter <- 30
-min.scatter <- 0.000865
+max.scatter <- 20
+min.scatter <- 0.0005
 
 b <- params[2]
 c <- params[1]
