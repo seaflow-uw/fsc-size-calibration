@@ -1,6 +1,6 @@
 library(scales)
 library(viridis)
-path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
+path.to.git.repository <- "~/Documents/Codes/fsc-size-calibration"
 setwd(path.to.git.repository)
 
 #############################
@@ -33,6 +33,7 @@ library(DEoptim)
 
 # Mie theory fitting
 # n for phyto = 1.35- 1.41 # see Lehmuskero et al. Progr Oceanogr 2018
+#mie2 <- t(read.csv("meidata-1010.csv", header=F)) # low
 mie2 <- t(read.csv("meidata-1017.csv", header=F)) # low
 mie1 <- t(read.csv("meidata-1032.csv", header=F)) # fit
 mie3 <- t(read.csv("meidata-1055.csv", header=F)) # high
@@ -134,8 +135,11 @@ for(inst in c(740,751,989)){
 
 dev.off()
 
+nrow(mie_740[,])
+nrow(mie_751[,])
+nrow(mie_989[,])
 
-mie <- data.frame(cbind(mie_740[-1,], mie_751[,-1], mie_989[,-1]))
+mie <- data.frame(cbind(mie_740[,], mie_751[,-1], mie_989[-1,-1]))
 summary(mie)
 
 par(mfrow=c(1,1))
@@ -157,7 +161,7 @@ write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
 
 
 q <- 'mid'
-id <- findInterval(0.5, mie[,paste0('diam_740_',q)])
+id <- findInterval(0.55, mie[,paste0('diam_740_',q)])
 mie[id,paste0('Qc_740_',q)]*1000
 
 #####################
